@@ -729,8 +729,8 @@
         <nav class="nav" aria-label="Main navigation">
             <a href="#art">Her art</a>
             <a href="#about">About</a>
-            <button class="music-button" id="musicButton" type="button" aria-label="Music unavailable">
-                <span aria-hidden="true">♫</span><span id="musicLabel">Her song</span>
+            <button class="music-button" id="musicButton" type="button" aria-label="Play Her Song">
+                <span aria-hidden="true">♫</span><span id="musicLabel">Play Her Song</span>
             </button>
         </nav>
     </header>
@@ -739,7 +739,7 @@
         <section class="hero" aria-labelledby="hero-title">
             <div class="hero-inner">
                 <div class="hero-copy">
-                    <div class="eyebrow">A birthday gallery</div>
+                    <div class="eyebrow" aria-hidden="true"></div>
                     <h1 id="hero-title">AZRA</h1>
                     <p>An artist who turns feelings into art.</p>
                     <a class="hero-link" href="#birthday"><span aria-hidden="true">↓</span> Enter her world</a>
@@ -824,6 +824,8 @@
 
     <footer>For Azra · January 8, 2006 · A little world made just for you</footer>
 
+    <audio id="herSong" loop preload="auto" src="azra-song.mp4"></audio>
+
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightbox-caption">
         <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close artwork viewer">×</button>
         <img class="lightbox-image" id="lightboxImage" src="" alt="">
@@ -859,12 +861,32 @@
         }, { threshold: .12 });
         document.querySelectorAll('.reveal').forEach((section) => revealObserver.observe(section));
 
-        // No audio file was provided, so the control stays transparent instead of embedding copyrighted music.
+        const herSong = document.querySelector('#herSong');
         const musicButton = document.querySelector('#musicButton');
-        musicButton.addEventListener('click', () => {
-            document.querySelector('#musicLabel').textContent = 'Add a licensed song';
-            musicButton.setAttribute('aria-label', 'No licensed audio file provided');
+        const musicLabel = document.querySelector('#musicLabel');
+
+        const updateMusicControl = () => {
+            const isPlaying = !herSong.paused;
+            musicLabel.textContent = isPlaying ? 'Pause Her Song' : 'Play Her Song';
+            musicButton.setAttribute('aria-label', isPlaying ? 'Pause Her Song' : 'Play Her Song');
+        };
+
+        const tryToPlaySong = () => herSong.play().then(updateMusicControl).catch(() => {
+            musicLabel.textContent = 'Play Her Song';
+            musicButton.setAttribute('aria-label', 'Play Her Song');
         });
+
+        musicButton.addEventListener('click', () => {
+            if (herSong.paused) {
+                tryToPlaySong();
+            } else {
+                herSong.pause();
+                updateMusicControl();
+            }
+        });
+        herSong.addEventListener('play', updateMusicControl);
+        herSong.addEventListener('pause', updateMusicControl);
+        window.addEventListener('load', tryToPlaySong, { once: true });
     </script>
 </body>
 
