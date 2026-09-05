@@ -869,10 +869,13 @@
             musicButton.setAttribute('aria-label', isPlaying ? 'Pause Her Song' : 'Play Her Song');
         };
 
-        const tryToPlaySong = () => herSong.play().then(updateMusicControl).catch(() => {
-            musicLabel.textContent = 'Play Her Song';
-            musicButton.setAttribute('aria-label', 'Play Her Song');
-        });
+        const tryToPlaySong = () => {
+            herSong.currentTime = 0;
+            return herSong.play().then(updateMusicControl).catch(() => {
+                musicLabel.textContent = 'Play Her Song';
+                musicButton.setAttribute('aria-label', 'Play Her Song');
+            });
+        };
 
         musicButton.addEventListener('click', () => {
             if (herSong.paused) {
