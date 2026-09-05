@@ -888,6 +888,11 @@
         herSong.addEventListener('play', updateMusicControl);
         herSong.addEventListener('pause', updateMusicControl);
         window.addEventListener('load', tryToPlaySong, { once: true });
+        ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach((eventName) => {
+            window.addEventListener(eventName, () => {
+                if (herSong.paused) tryToPlaySong();
+            }, { once: true, passive: true });
+        });
     </script>
 </body>
 
